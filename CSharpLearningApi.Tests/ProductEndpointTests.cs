@@ -52,6 +52,19 @@ public class ProductEndpointTests
         ));
 
         Assert.Equal(HttpStatusCode.Created, addResponse.StatusCode);
+        Assert.NotNull(addResponse.Headers.Location);
+
+        var getResponse = await client.GetAsync(addResponse.Headers.Location);
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        using var jsonDocument = JsonDocument.Parse(
+            await getResponse.Content.ReadAsStringAsync());
+
+        var product = jsonDocument.RootElement;
+
+        Assert.Equal("New Product", product.GetProperty("name").GetString());
+        Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
     }
 
     [Fact]
