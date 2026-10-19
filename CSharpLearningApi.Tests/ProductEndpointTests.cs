@@ -69,12 +69,13 @@ public class ProductEndpointTests
             "application/json"
         ));
 
+        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+
         using var jsonDocument = JsonDocument.Parse(
             await updateResponse.Content.ReadAsStringAsync());
 
         var product = jsonDocument.RootElement;
 
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.Equal(1, product.GetProperty("id").GetInt32());
         Assert.Equal("Updated Product", product.GetProperty("name").GetString());
         Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
