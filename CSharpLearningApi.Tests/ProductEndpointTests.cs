@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -48,7 +47,7 @@ public class ProductEndpointTests
                 ""name"": ""New Product"",
                 ""price"": 9.99
             }",
-            System.Text.Encoding.UTF8,
+            Encoding.UTF8,
             "application/json"
         ));
 
@@ -75,6 +74,7 @@ public class ProductEndpointTests
 
         var product = jsonDocument.RootElement;
 
+        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.Equal(1, product.GetProperty("id").GetInt32());
         Assert.Equal("Updated Product", product.GetProperty("name").GetString());
         Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
