@@ -146,3 +146,6 @@
 /Users/danyu/Downloads/csharp-lessons/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /Users/danyu/Downloads/csharp-lessons/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /Users/danyu/Downloads/csharp-lessons/bin/Debug/net10.0/dotnet-tools.json
+/Users/danyu/Downloads/csharp-lessons/obj/Debug/net10.0/CSharpLearningApi.sourcelink.json
+/Users/danyu/Downloads/csharp-lessons/bin/Debug/net10.0/CSharpLearningApi.Tests/obj/CSharpLearningApi.Tests.csproj.nuget.dgspec.json
+/Users/danyu/Downloads/csharp-lessons/bin/Debug/net10.0/CSharpLearningApi.Tests/obj/project.assets.json
