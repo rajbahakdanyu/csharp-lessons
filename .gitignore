@@ -11,11 +11,3 @@
 .idea/
 .vs/
 .DS_Store
-**/bin/
-**/obj/
-**/TestResults/
-**/coverage/
-
-*.db
-*.db-shm
-*.db-wal
