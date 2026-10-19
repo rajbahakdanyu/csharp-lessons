@@ -79,11 +79,11 @@ app.MapDelete("/products/{id:int}", async Task<IResult> (
 
 app.Run();
 
-internal sealed record CreateProductRequest(
+public sealed record CreateProductRequest(
     [Required][StringLength(100)] string Name,
     [Range(0.01, 999999.99)] decimal Price);
 
-internal sealed record UpdateProductRequest(
+public sealed record UpdateProductRequest(
     [Required][StringLength(100)] string Name,
     [Range(0.01, 999999.99)] decimal Price);
 

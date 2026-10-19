@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Compile Remove="CSharpLearningApi.Tests/**/*.cs" />
+    <Content Remove="CSharpLearningApi.Tests/**" />
   </ItemGroup>
 
 </Project>
