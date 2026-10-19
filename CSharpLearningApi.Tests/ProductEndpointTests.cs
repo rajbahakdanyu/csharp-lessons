@@ -1,4 +1,7 @@
 using System.Net;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace CSharpLearningApi.Tests;
 
@@ -63,11 +66,18 @@ public class ProductEndpointTests
                 ""name"": ""Updated Product"",
                 ""price"": 9.99
             }",
-            System.Text.Encoding.UTF8,
+            Encoding.UTF8,
             "application/json"
         ));
 
-        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+        using var jsonDocument = JsonDocument.Parse(
+            await updateResponse.Content.ReadAsStringAsync());
+
+        var product = jsonDocument.RootElement;
+
+        Assert.Equal(1, product.GetProperty("id").GetInt32());
+        Assert.Equal("Updated Product", product.GetProperty("name").GetString());
+        Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
     }
 
     [Fact]
@@ -81,10 +91,32 @@ public class ProductEndpointTests
                 ""name"": ""Updated Product"",
                 ""price"": 9.99
             }",
-            System.Text.Encoding.UTF8,
+            Encoding.UTF8,
             "application/json"
         ));
 
         Assert.Equal(HttpStatusCode.NotFound, updateResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_existing_product_returns_ok()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var getResponse = await client.GetAsync("/products/1");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_non_existing_product_returns_not_found()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var getResponse = await client.GetAsync("/products/999");
+
+        Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 }
