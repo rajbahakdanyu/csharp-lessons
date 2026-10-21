@@ -5,6 +5,8 @@ using System.Text.Json;
 
 namespace CSharpLearningApi.Tests;
 
+public sealed record ProductResponse(int Id, string Name, decimal Price);
+
 public class ProductEndpointTests
 {
     [Fact]
@@ -95,7 +97,7 @@ public class ProductEndpointTests
         Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
 
         var getResponse = await client.GetAsync("/products/1");
-        
+
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
         using var getJsonDocument = JsonDocument.Parse(
@@ -134,6 +136,13 @@ public class ProductEndpointTests
         var getResponse = await client.GetAsync("/products/1");
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var product = await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(product);
+        Assert.Equal(1, product.Id);
+        Assert.Equal("Keyboard", product.Name);
+        Assert.Equal(79.99m, product.Price);
     }
 
     [Fact]
