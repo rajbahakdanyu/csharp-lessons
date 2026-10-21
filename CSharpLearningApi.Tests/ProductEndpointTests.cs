@@ -151,4 +151,21 @@ public class ProductEndpointTests
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+
+    [Theory]
+    [InlineData(0.01)]
+    [InlineData(999999.99)]
+    public async Task Add_product_at_price_boundary_returns_created(double price)
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/products", new
+        {
+            name = "Boundary Product",
+            price
+        });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
 }
