@@ -135,16 +135,18 @@ public class ProductEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
-    [Fact]
-    public async Task Add_invalid_product_returns_bad_request()
+    [Theory]
+    [InlineData("", 9.99)]
+    [InlineData("Bad Price", 0)]
+    public async Task Add_invalid_product_returns_bad_request(string name, decimal price)
     {
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
 
         var response = await client.PostAsJsonAsync("/products", new
         {
-            name = "Bad Price",
-            price = 0
+            name = name,
+            price = price
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
