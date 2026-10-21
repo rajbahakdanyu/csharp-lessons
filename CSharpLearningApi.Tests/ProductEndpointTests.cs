@@ -93,6 +93,18 @@ public class ProductEndpointTests
         Assert.Equal(1, product.GetProperty("id").GetInt32());
         Assert.Equal("Updated Product", product.GetProperty("name").GetString());
         Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
+
+        var getResponse = await client.GetAsync("/products/1");
+        
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        using var getJsonDocument = JsonDocument.Parse(
+            await getResponse.Content.ReadAsStringAsync());
+
+        var getProduct = getJsonDocument.RootElement;
+        Assert.Equal(1, getProduct.GetProperty("id").GetInt32());
+        Assert.Equal("Updated Product", getProduct.GetProperty("name").GetString());
+        Assert.Equal(9.99m, getProduct.GetProperty("price").GetDecimal());
     }
 
     [Fact]
