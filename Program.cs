@@ -30,43 +30,6 @@ app.UseHttpsRedirection();
 
 app.MapProductEndpoints();
 
-app.MapPost("/products", async (
-    CreateProductRequest request,
-    IProductCatalog catalog,
-    CancellationToken cancellationToken) =>
-{
-    var newProduct = await catalog.AddAsync(request.Name, request.Price, cancellationToken);
-    return TypedResults.Created(
-    $"/products/{newProduct.Id}",
-    new ProductResponse(newProduct.Id, newProduct.Name, newProduct.Price));
-})
-    .WithName("CreateProduct");
-
-app.MapPut("/products/{id:int}", async Task<IResult> (
-    int id,
-    UpdateProductRequest request,
-    IProductCatalog catalog,
-    CancellationToken cancellationToken) =>
-{
-    var updatedProduct = await catalog.UpdateAsync(id, request.Name, request.Price, cancellationToken);
-    if (updatedProduct is null)
-    {
-        return Results.NotFound();
-    }
-    return TypedResults.Ok(new ProductResponse(updatedProduct.Id, updatedProduct.Name, updatedProduct.Price));
-})
-    .WithName("UpdateProduct");
-
-app.MapDelete("/products/{id:int}", async Task<IResult> (
-    int id,
-    IProductCatalog catalog,
-    CancellationToken cancellationToken) =>
-{
-    var deleted = await catalog.DeleteAsync(id, cancellationToken);
-    return deleted ? Results.NoContent() : Results.NotFound();
-})
-    .WithName("DeleteProduct");
-
 app.Run();
 
 public sealed record CreateProductRequest(
