@@ -11,8 +11,12 @@ public static class ProductEndpoints
             [Range(1, 100)] int pageSize = 10) =>
         {
             var products = await catalog.GetPageAsync(page, pageSize, cancellationToken);
-            return Results.Ok(products.Select(p =>
-                new ProductResponse(p.Id, p.Name, p.Price)));
+            var totalCount = await catalog.GetCountAsync(cancellationToken);
+            return Results.Ok(new PagedProductsResponse(
+                products.Select(p => new ProductResponse(p.Id, p.Name, p.Price)).ToList(),
+                page,
+                pageSize,
+                totalCount));
         })
         .WithName("GetProducts");
 

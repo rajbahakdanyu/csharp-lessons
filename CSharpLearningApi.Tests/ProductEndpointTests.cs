@@ -5,6 +5,12 @@ namespace CSharpLearningApi.Tests;
 
 public sealed record ProductResponse(int Id, string Name, decimal Price);
 
+public sealed record PagedProductsResponse(
+    IReadOnlyList<ProductResponse> Items,
+    int Page,
+    int PageSize,
+    int TotalCount);
+
 public class ProductEndpointTests
 {
     [Fact]
@@ -139,10 +145,13 @@ public class ProductEndpointTests
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
-        var products = await getResponse.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var pagedResponse = await getResponse.Content.ReadFromJsonAsync<PagedProductsResponse>();
 
-        Assert.NotNull(products);
-        var product = Assert.Single(products);
+        Assert.NotNull(pagedResponse);
+        var product = Assert.Single(pagedResponse.Items);
+        Assert.Equal(2, pagedResponse.Page);
+        Assert.Equal(2, pagedResponse.PageSize);
+        Assert.Equal(3, pagedResponse.TotalCount);
         Assert.Equal(3, product.Id);
         Assert.Equal("Monitor", product.Name);
         Assert.Equal(249.99m, product.Price);
@@ -172,19 +181,22 @@ public class ProductEndpointTests
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
-        var products = await getResponse.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var pagedResponse = await getResponse.Content.ReadFromJsonAsync<PagedProductsResponse>();
 
-        Assert.NotNull(products);
-        Assert.Equal(3, products.Count);
-        Assert.Equal(1, products[0].Id);
-        Assert.Equal("Keyboard", products[0].Name);
-        Assert.Equal(79.99m, products[0].Price);
-        Assert.Equal(2, products[1].Id);
-        Assert.Equal("Mouse", products[1].Name);
-        Assert.Equal(24.50m, products[1].Price);
-        Assert.Equal(3, products[2].Id);
-        Assert.Equal("Monitor", products[2].Name);
-        Assert.Equal(249.99m, products[2].Price);
+        Assert.NotNull(pagedResponse);
+        Assert.Equal(1, pagedResponse.Page);
+        Assert.Equal(10, pagedResponse.PageSize);
+        Assert.Equal(3, pagedResponse.TotalCount);
+        Assert.Equal(3, pagedResponse.Items.Count);
+        Assert.Equal(1, pagedResponse.Items[0].Id);
+        Assert.Equal("Keyboard", pagedResponse.Items[0].Name);
+        Assert.Equal(79.99m, pagedResponse.Items[0].Price);
+        Assert.Equal(2, pagedResponse.Items[1].Id);
+        Assert.Equal("Mouse", pagedResponse.Items[1].Name);
+        Assert.Equal(24.50m, pagedResponse.Items[1].Price);
+        Assert.Equal(3, pagedResponse.Items[2].Id);
+        Assert.Equal("Monitor", pagedResponse.Items[2].Name);
+        Assert.Equal(249.99m, pagedResponse.Items[2].Price);
     }
 
     [Fact]

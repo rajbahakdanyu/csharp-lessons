@@ -11,6 +11,7 @@ internal interface IProductCatalog
     int page,
     int pageSize,
     CancellationToken cancellationToken);
+    Task<int> GetCountAsync(CancellationToken cancellationToken);
 }
 
 internal sealed class ProductCatalog : IProductCatalog
@@ -81,7 +82,7 @@ internal sealed class ProductCatalog : IProductCatalog
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
-    
+
     public async Task<IReadOnlyList<Product>> GetPageAsync(
         int page,
         int pageSize,
@@ -93,5 +94,10 @@ internal sealed class ProductCatalog : IProductCatalog
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetCountAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.Products.CountAsync(cancellationToken);
     }
 }

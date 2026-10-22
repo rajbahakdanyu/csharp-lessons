@@ -41,3 +41,9 @@ public sealed record UpdateProductRequest(
     [Range(0.01, 999999.99)] decimal Price);
 
 public sealed record ProductResponse(int Id, string Name, decimal Price);
+
+public sealed record PagedProductsResponse(
+    IReadOnlyList<ProductResponse> Items,
+    int Page,
+    int PageSize,
+    int TotalCount);
