@@ -3,10 +3,10 @@ public static class ProductEndpoints
     public static void MapProductEndpoints(this WebApplication app)
     {
         app.MapGet("/products", async (
-            int page,
-            int pageSize,
             IProductCatalog catalog,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 10) =>
         {
             var products = await catalog.GetPageAsync(page, pageSize, cancellationToken);
             return Results.Ok(products.Select(p =>

@@ -150,6 +150,31 @@ public class ProductEndpointTests
     }
 
     [Fact]
+    public async Task Get_products_first_page_returns_ok()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var getResponse = await client.GetAsync("/products");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var products = await getResponse.Content.ReadFromJsonAsync<List<ProductResponse>>();
+
+        Assert.NotNull(products);
+        Assert.Equal(3, products.Count);
+        Assert.Equal(1, products[0].Id);
+        Assert.Equal("Keyboard", products[0].Name);
+        Assert.Equal(79.99m, products[0].Price);
+        Assert.Equal(2, products[1].Id);
+        Assert.Equal("Mouse", products[1].Name);
+        Assert.Equal(24.50m, products[1].Price);
+        Assert.Equal(3, products[2].Id);
+        Assert.Equal("Monitor", products[2].Name);
+        Assert.Equal(249.99m, products[2].Price);
+    }
+
+    [Fact]
     public async Task Get_non_existing_product_returns_not_found()
     {
         using var factory = new ApiFactory();
