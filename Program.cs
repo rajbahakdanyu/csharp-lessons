@@ -38,7 +38,9 @@ app.MapGet("/products/{id:int}", async Task<IResult> (
     CancellationToken cancellationToken) =>
 {
     var product = await catalog.GetByIdAsync(id, cancellationToken);
-    return product is null ? Results.NotFound() : Results.Ok(product);
+    return product is null
+    ? Results.NotFound()
+    : Results.Ok(new ProductResponse(product.Id, product.Name, product.Price));
 })
     .WithName("GetProductById");
 
@@ -48,7 +50,9 @@ app.MapPost("/products", async (
     CancellationToken cancellationToken) =>
 {
     var newProduct = await catalog.AddAsync(request.Name, request.Price, cancellationToken);
-    return TypedResults.Created($"/products/{newProduct.Id}", newProduct);
+    return TypedResults.Created(
+    $"/products/{newProduct.Id}",
+    new ProductResponse(newProduct.Id, newProduct.Name, newProduct.Price));
 })
     .WithName("CreateProduct");
 
@@ -63,7 +67,7 @@ app.MapPut("/products/{id:int}", async Task<IResult> (
     {
         return Results.NotFound();
     }
-    return TypedResults.Ok(updatedProduct);
+    return TypedResults.Ok(new ProductResponse(updatedProduct.Id, updatedProduct.Name, updatedProduct.Price));
 })
     .WithName("UpdateProduct");
 
@@ -87,4 +91,4 @@ public sealed record UpdateProductRequest(
     [Required][StringLength(100)] string Name,
     [Range(0.01, 999999.99)] decimal Price);
 
-public partial class Program { }
+public sealed record ProductResponse(int Id, string Name, decimal Price);
