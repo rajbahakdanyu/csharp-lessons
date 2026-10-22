@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
@@ -5,8 +7,8 @@ public static class ProductEndpoints
         app.MapGet("/products", async (
             IProductCatalog catalog,
             CancellationToken cancellationToken,
-            int page = 1,
-            int pageSize = 10) =>
+            [Range(1, 100)] int page = 1,
+            [Range(1, 100)] int pageSize = 10) =>
         {
             var products = await catalog.GetPageAsync(page, pageSize, cancellationToken);
             return Results.Ok(products.Select(p =>

@@ -129,7 +129,6 @@ public class ProductEndpointTests
         Assert.Equal(79.99m, product.Price);
     }
 
-
     [Fact]
     public async Task Get_products_page_returns_ok()
     {
@@ -147,6 +146,20 @@ public class ProductEndpointTests
         Assert.Equal(3, product.Id);
         Assert.Equal("Monitor", product.Name);
         Assert.Equal(249.99m, product.Price);
+    }
+
+
+    [Theory]
+    [InlineData(0, 2)]
+    [InlineData(1, 101)]
+    public async Task Get_products_page_returns_out_of_range(int page, int pageSize)
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var getResponse = await client.GetAsync($"/products?page={page}&pageSize={pageSize}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, getResponse.StatusCode);
     }
 
     [Fact]
