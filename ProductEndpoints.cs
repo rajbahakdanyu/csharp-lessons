@@ -2,10 +2,15 @@ public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
     {
-        app.MapGet("/products", async (IProductCatalog catalog, CancellationToken cancellationToken) =>
+        app.MapGet("/products", async (
+            int page,
+            int pageSize,
+            IProductCatalog catalog,
+            CancellationToken cancellationToken) =>
         {
-            var products = await catalog.GetAllAsync(cancellationToken);
-            return Results.Ok(products.Select(p => new ProductResponse(p.Id, p.Name, p.Price)));
+            var products = await catalog.GetPageAsync(page, pageSize, cancellationToken);
+            return Results.Ok(products.Select(p =>
+                new ProductResponse(p.Id, p.Name, p.Price)));
         })
         .WithName("GetProducts");
 

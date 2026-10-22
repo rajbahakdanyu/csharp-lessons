@@ -7,6 +7,10 @@ internal interface IProductCatalog
     Task<Product> AddAsync(string name, decimal price, CancellationToken cancellationToken);
     Task<Product?> UpdateAsync(int id, string name, decimal price, CancellationToken cancellationToken);
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Product>> GetPageAsync(
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken);
 }
 
 internal sealed class ProductCatalog : IProductCatalog
@@ -76,5 +80,18 @@ internal sealed class ProductCatalog : IProductCatalog
         _dbContext.Products.Remove(product);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
+    }
+    
+    public async Task<IReadOnlyList<Product>> GetPageAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Products
+            .AsNoTracking()
+            .OrderBy(product => product.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
     }
 }
