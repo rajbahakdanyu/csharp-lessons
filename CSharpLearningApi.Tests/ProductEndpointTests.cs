@@ -143,8 +143,7 @@ public class ProductEndpointTests
         var products = await getResponse.Content.ReadFromJsonAsync<List<ProductResponse>>();
 
         Assert.NotNull(products);
-        Assert.NotEmpty(products);
-        var product = products[0];
+        var product = Assert.Single(products);
         Assert.Equal(3, product.Id);
         Assert.Equal("Monitor", product.Name);
         Assert.Equal(249.99m, product.Price);
