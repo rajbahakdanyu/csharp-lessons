@@ -157,6 +157,25 @@ public class ProductEndpointTests
         Assert.Equal(249.99m, product.Price);
     }
 
+    [Fact]
+    public async Task Get_products_page_out_of_range_returns_ok()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        var getResponse = await client.GetAsync("/products?page=99&pageSize=2");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var pagedResponse = await getResponse.Content.ReadFromJsonAsync<PagedProductsResponse>();
+
+        Assert.NotNull(pagedResponse);
+        Assert.Empty(pagedResponse.Items);
+        Assert.Equal(99, pagedResponse.Page);
+        Assert.Equal(2, pagedResponse.PageSize);
+        Assert.Equal(3, pagedResponse.TotalCount);
+    }
+
 
     [Theory]
     [InlineData(0, 2)]
