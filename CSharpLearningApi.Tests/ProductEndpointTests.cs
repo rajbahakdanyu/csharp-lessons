@@ -1,7 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace CSharpLearningApi.Tests;
 
@@ -45,14 +43,11 @@ public class ProductEndpointTests
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
 
-        var addResponse = await client.PostAsync("/products", new StringContent(
-            @"{
-                ""name"": ""New Product"",
-                ""price"": 9.99
-            }",
-            Encoding.UTF8,
-            "application/json"
-        ));
+        var addResponse = await client.PostAsJsonAsync("/products", new
+        {
+            name = "New Product",
+            price = 9.99m
+        });
 
         Assert.Equal(HttpStatusCode.Created, addResponse.StatusCode);
         Assert.NotNull(addResponse.Headers.Location);
@@ -61,13 +56,11 @@ public class ProductEndpointTests
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
-        using var jsonDocument = JsonDocument.Parse(
-            await getResponse.Content.ReadAsStringAsync());
+        var product = await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
 
-        var product = jsonDocument.RootElement;
-
-        Assert.Equal("New Product", product.GetProperty("name").GetString());
-        Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
+        Assert.NotNull(product);
+        Assert.Equal("New Product", product.Name);
+        Assert.Equal(9.99m, product.Price);
     }
 
     [Fact]
@@ -76,37 +69,31 @@ public class ProductEndpointTests
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
 
-        var updateResponse = await client.PutAsync("/products/1", new StringContent(
-            @"{
-                ""name"": ""Updated Product"",
-                ""price"": 9.99
-            }",
-            Encoding.UTF8,
-            "application/json"
-        ));
+        var updateResponse = await client.PutAsJsonAsync("/products/1", new
+        {
+            name = "Updated Product",
+            price = 9.99m
+        });
 
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
 
-        using var jsonDocument = JsonDocument.Parse(
-            await updateResponse.Content.ReadAsStringAsync());
+        var product = await updateResponse.Content.ReadFromJsonAsync<ProductResponse>();
 
-        var product = jsonDocument.RootElement;
-
-        Assert.Equal(1, product.GetProperty("id").GetInt32());
-        Assert.Equal("Updated Product", product.GetProperty("name").GetString());
-        Assert.Equal(9.99m, product.GetProperty("price").GetDecimal());
+        Assert.NotNull(product);
+        Assert.Equal(1, product.Id);
+        Assert.Equal("Updated Product", product.Name);
+        Assert.Equal(9.99m, product.Price);
 
         var getResponse = await client.GetAsync("/products/1");
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
-        using var getJsonDocument = JsonDocument.Parse(
-            await getResponse.Content.ReadAsStringAsync());
+        var getProduct = await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
 
-        var getProduct = getJsonDocument.RootElement;
-        Assert.Equal(1, getProduct.GetProperty("id").GetInt32());
-        Assert.Equal("Updated Product", getProduct.GetProperty("name").GetString());
-        Assert.Equal(9.99m, getProduct.GetProperty("price").GetDecimal());
+        Assert.NotNull(getProduct);
+        Assert.Equal(1, getProduct.Id);
+        Assert.Equal("Updated Product", getProduct.Name);
+        Assert.Equal(9.99m, getProduct.Price);
     }
 
     [Fact]
@@ -115,14 +102,11 @@ public class ProductEndpointTests
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
 
-        var updateResponse = await client.PutAsync("/products/999", new StringContent(
-            @"{
-                ""name"": ""Updated Product"",
-                ""price"": 9.99
-            }",
-            Encoding.UTF8,
-            "application/json"
-        ));
+        var updateResponse = await client.PutAsJsonAsync("/products/999", new
+        {
+            name = "Updated Product",
+            price = 9.99m
+        });
 
         Assert.Equal(HttpStatusCode.NotFound, updateResponse.StatusCode);
     }
@@ -166,8 +150,8 @@ public class ProductEndpointTests
 
         var response = await client.PostAsJsonAsync("/products", new
         {
-            name = name,
-            price = price
+            name,
+            price
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -176,7 +160,7 @@ public class ProductEndpointTests
     [Theory]
     [InlineData(0.01)]
     [InlineData(999999.99)]
-    public async Task Add_product_at_price_boundary_returns_created(double price)
+    public async Task Add_product_at_price_boundary_returns_created(decimal price)
     {
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
