@@ -29,7 +29,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGet("/products", async (IProductCatalog catalog, CancellationToken cancellationToken) =>
-    await catalog.GetAllAsync(cancellationToken))
+    {
+        var products = await catalog.GetAllAsync(cancellationToken);
+        return Results.Ok(products.Select(p => new ProductResponse(p.Id, p.Name, p.Price)));
+    })
     .WithName("GetProducts");
 
 app.MapGet("/products/{id:int}", async Task<IResult> (
